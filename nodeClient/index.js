@@ -1,0 +1,74 @@
+const os = require("os");
+
+function cpuAverage() {
+  const cpus = os.cpus();
+
+  let idleMs = 0;
+  let totalMs = 0;
+
+  cpus.forEach((aCore) => {
+    for (mode in aCore.times) {
+      totalMs += aCore.times[mode];
+    }
+    idleMs += aCore.times.idle;
+  });
+
+  return {
+    idle: idleMs / cpus.length,
+    total: totalMs / cpus.length,
+  };
+}
+
+const getCpuLoad = (cpus) =>
+  new Promise((res, rej) => {
+    const start = cpuAverage(cpus); // "Now" value of load
+    setTimeout(() => {
+      const end = cpuAverage(cpus); // "End" value of now
+      const idleDiff = end.idle - start.idle;
+      const totalDiff = end.total - start.total;
+
+      const percentOfCpu = 100 - Math.floor((100 * idleDiff) / totalDiff);
+      res(percentOfCpu);
+    }, 100);
+  });
+
+const performanceLoadData = () =>
+  new Promise(async (res, rej) => {
+    const osType = os.type() === "Darwin" ? "Mac" : os.type();
+
+    const cpus = os.cpus();
+
+    const upTime = os.uptime();
+
+    const freeMem = os.freemem(); // in bytes
+
+    const totalMem = os.totalmem(); // in bytes
+
+    const usedMem = totalMem - freeMem;
+    const memUsage = Math.floor((usedMem / totalMem) * 100) / 100;
+
+    const cpuType = cpus[0].model;
+    const numCores = cpus.length;
+    const cpuSpeed = cpus[0].speed;
+    const cpuLoad = await getCpuLoad();
+
+    res({
+      freeMem,
+      totalMem,
+      usedMem,
+      memUsage,
+      osType,
+      upTime,
+      cpuType,
+      numCores,
+      cpuSpeed,
+      cpuLoad,
+    });
+  });
+
+const run = async () => {
+  const data = await performanceLoadData();
+  console.log(data);
+};
+
+run();
