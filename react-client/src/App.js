@@ -1,25 +1,23 @@
+import { useEffect, useState } from "react";
 import logo from "./logo.svg";
 import "./App.css";
-import socketConnection from "./socketConnection";
+import socket from "./socketConnection";
+import Widget from "./perfDataComponents/Widget";
 
 function App() {
+  const [performanceData, setPerformanceData] = useState({});
+  useEffect(() => {
+    socket.on("perfData", (data) => {
+      console.log("data: ", data);
+      const copyPerfData = { ...performanceData };
+      copyPerfData[data.macA] = data;
+      setPerformanceData(copyPerfData);
+    });
+  });
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Widget />
+    </>
   );
 }
 

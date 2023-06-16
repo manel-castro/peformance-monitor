@@ -15,7 +15,7 @@ const socketMain = (io) => {
     console.log(auth.token);
     socket.emit("welcome", "hello world");
     socket.on("perfData", (data) => {
-      console.log("tick...", data);
+      io.to("reactClient").emit("perfData", data);
     });
   });
 };
