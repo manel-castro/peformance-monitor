@@ -8,7 +8,6 @@ function App() {
   const [performanceData, setPerformanceData] = useState({});
   useEffect(() => {
     socket.on("perfData", (data) => {
-      console.log("data: ", data);
       const copyPerfData = { ...performanceData };
       copyPerfData[data.macA] = data;
       setPerformanceData(copyPerfData);
