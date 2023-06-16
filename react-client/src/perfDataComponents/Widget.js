@@ -1,15 +1,34 @@
+import "./Widget.css";
 import Cpu from "./Cpu";
 import Info from "./Info";
 import Mem from "./Mem";
 
-const Widget = () => {
+const Widget = ({ data }) => {
+  const {
+    freeMem,
+    totalMem,
+    usedMem,
+    memUsage,
+    osType,
+    upTime,
+    cpuType,
+    numCores,
+    cpuSpeed,
+    cpuLoad,
+    macA,
+  } = data;
+
+  const cpuData = { cpuLoad };
+  const memData = { freeMem, totalMem, usedMem, memUsage };
+  const infoData = { macA, osType, upTime, cpuType, cpuSpeed, numCores };
+
   return (
-    <h1>
+    <div className="widget row justify-content-evenly">
       Widget
-      <Cpu />
-      <Mem />
-      <Info />
-    </h1>
+      <Cpu data={cpuData} />
+      <Mem data={memData} />
+      <Info data={infoData} />
+    </div>
   );
 };
 export default Widget;
