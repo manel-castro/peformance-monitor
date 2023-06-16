@@ -1,4 +1,35 @@
 const os = require("os");
+const io = require("socket.io-client");
+const options = {
+  auth: {
+    token: "asdfañlskdjglk12",
+  },
+};
+const socket = io("http://127.0.0.1:3000", options);
+
+socket.on("connect", () => {
+  console.log("we connected to the server");
+
+  const nI = os.networkInterfaces(); // A list of all network interfaces on this machine
+  let macAddress;
+  for (let key in nI) {
+    const isInternetFacing = !nI[key][0].internal;
+    if (isInternetFacing) {
+      macAddress = nI[key][0].mac;
+      break;
+    }
+  }
+
+  const perfDataInterval = setInterval(async () => {
+    const perfData = await performanceLoadData();
+    perfData.macA = macAddress;
+    socket.emit("perfData", perfData);
+  }, 1000);
+
+  socket.on("disconnect", () => {
+    clearInterval(perfDataInterval);
+  });
+});
 
 function cpuAverage() {
   const cpus = os.cpus();
@@ -66,9 +97,8 @@ const performanceLoadData = () =>
     });
   });
 
+// Testing:
 const run = async () => {
   const data = await performanceLoadData();
   console.log(data);
 };
-
-run();
